@@ -1,0 +1,77 @@
+Dataset Description:
+
+Column 1 : PassengerId
+Column 2 : Survived (survived=0 & died=1)
+Column 3 : Pclass
+Column 4 : Name
+Column 5 : Sex
+Column 6 : Age
+Column 7 : SibSp
+Column 8 : Parch
+Column 9 : Ticket
+Column 10 : Fare
+Column 11 : Cabin
+Column 12 : Embarked
+
+To execute the below scripts
+
+pig -x local /home/acadgild/Assignment-session10/project1_2_1.pig
+pig -x local /home/acadgild/Assignment-session10/project1_2_2.pig
+pig -x local /home/acadgild/Assignment-session10/project1_2_3.pig
+
+************************************************************************************************************************
+------------------------------------------------------------------------------------------------------------------------
+(A) In this problem statement we will find the average fare of each class.
+------------------------------------------------------------------------------------------------------------------------
+
+TitanicData = LOAD '/home/acadgild/Assignment-session10/TitanicData.txt' USING PigStorage(',') AS (PID:long, Survived:int, PClass:int, Name:chararray, Sex:chararray, Age:int, SibSp:chararray, Parch:chararray, Ticket:long, Fare:float, Cabin:chararray, Embarked:chararray) ;
+
+Data1 = FOREACH TitanicData GENERATE PClass, Fare ;
+
+DataGrp  = GROUP Data1 BY PClass ;
+
+AvgFare = FOREACH DataGrp GENERATE group, AVG(Data1.Fare) ;
+
+DUMP AvgFare;
+
+************************************************************************************************************************
+
+************************************************************************************************************************
+------------------------------------------------------------------------------------------------------------------------
+(B) In this problem statement we will find the number of people alive in each class and are embarked in Southampton.
+------------------------------------------------------------------------------------------------------------------------
+
+TitanicData = LOAD '/home/acadgild/Assignment-session10/TitanicData.txt' USING PigStorage(',') AS (PID:long, Survived:int, PClass:int, Name:chararray, Sex:chararray, Age:int, SibSp:chararray, Parch:chararray, Ticket:long, Fare:float, Cabin:chararray, Embarked:chararray) ;
+
+Data1 = FOREACH TitanicData GENERATE PClass, Survived,Embarked ;
+
+Data2 = FILTER Data1 BY (Embarked == 'S' AND Survived == 0) ;
+
+DataGrp  = GROUP Data2 BY PClass ;
+
+NumOfAlivePeople = FOREACH DataGrp GENERATE group, COUNT(Data2) ;
+
+DUMP NumOfAlivePeople;
+
+************************************************************************************************************************
+
+************************************************************************************************************************
+------------------------------------------------------------------------------------------------------------------------
+(C) In this problem statement we will find out number of male and female people died in each class.
+------------------------------------------------------------------------------------------------------------------------
+
+TitanicData = LOAD '/home/acadgild/Assignment-session10/TitanicData.txt' USING PigStorage(',') AS (PID:long, Survived:int, PClass:int, Name:chararray, Sex:chararray, Age:int, SibSp:chararray, Parch:chararray, Ticket:long, Fare:float, Cabin:chararray, Embarked:chararray) ;
+
+Data1 = FOREACH TitanicData GENERATE PClass, Survived,Sex ;
+
+Data2 = FILTER Data1 BY (Survived == 1) ;
+
+DataGrp  = GROUP Data2 BY (PClass, Sex );
+
+NumOfPeopleDied = FOREACH DataGrp GENERATE group, COUNT(Data2) ;
+
+DUMP NumOfPeopleDied;
+
+************************************************************************************************************************
+
+
